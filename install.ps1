@@ -20,13 +20,17 @@ if (Test-Path -Path $wslpath){
 }
 
 if(-not(Test-Path -Path $wslpath)){
-    New-Item -Path $wslpath+$wslpath_pref -ItemType 'directory'
+    New-Item -Path $wslpath_full -ItemType 'directory'
 }
 
-wsl --export Debian $wslpath+$wslpath_pref dockerondebian.tar
+wsl --export Debian $wslpath_full'\dockerondebian.tar'
 wsl --unregister Debian
 
 ###+++++++ Import Debian deb-main +++++++###
 
-wsl --import deb-master $wslpath'\master\' $wslpath_full'\dockerondebian.tar' 
+wsl --import deb-master $wslpath'\master\' $wslpath_full'\dockerondebian.tar'
+wsl -d deb-master -u root exit
+$swar_token = wsl -d deb-master -u root "./scripts/swarmInit.sh"
+
+
 wsl --import deb-node $wslpath'\node-'$node $wslpath_full'\dockerondebian.tar' 
