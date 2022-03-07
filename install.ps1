@@ -30,7 +30,13 @@ wsl --unregister Debian
 
 wsl --import deb-master $wslpath'\master\' $wslpath_full'\dockerondebian.tar'
 wsl -d deb-master -u root exit
-$swar_token = wsl -d deb-master -u root "./scripts/swarmInit.sh"
+wsl -d deb-master -u root service --status-all
+Start-Sleep -Seconds 15
+[System.Collections.ArrayList]$swarm_token = wsl -d deb-master -u root "./scripts/swarmInit.sh"
 
 
 wsl --import deb-node $wslpath'\node-'$node $wslpath_full'\dockerondebian.tar' 
+wsl -d deb-node -u root exit
+wsl -d deb-node -u root service --status-all
+Start-Sleep -Seconds 15
+wsl -d deb-node -u root $swarm_token[4]
