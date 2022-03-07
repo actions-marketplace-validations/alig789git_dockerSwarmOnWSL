@@ -39,4 +39,7 @@ wsl --import deb-node $wslpath'\node-'$node $wslpath_full'\dockerondebian.tar'
 wsl -d deb-node -u root exit
 wsl -d deb-node -u root service --status-all
 Start-Sleep -Seconds 15
-wsl -d deb-node -u root $swarm_token[4]
+
+"#!/bin/bash`n"+$swarm_token[4].Trim() | Out-File -FilePath '.\scripts\swarmJoin.sh' -Encoding utf8
+wsl -d deb-node -u root "./scripts/swarmJoin.sh"
+wsl -d deb-node -u root docker swarm join --token SWMTKN-1-45z62uzpv33tuc4qq5vdo3fpvktzs7umgat8tdfylsv4dg2m0g-evsse8h0oq8tnyo7uhdel377u 172.24.245.193:2377
