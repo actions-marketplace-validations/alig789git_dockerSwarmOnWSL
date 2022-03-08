@@ -1,26 +1,45 @@
-﻿$wslpath = 'C:\WSL'
+﻿$installWSL = $false
+$wslpath = 'C:\WSL'
 $wslpath_pref = '\distro'
 $wslpath_full = $wslpath+$wslpath_pref
 $node = 2
-###+++++++ Install WSL +++++++###
-$requieredFeautures = 'Microsoft-Windows-Subsystem-Linux','VirtualMachinePlatform'
-$match = 'State : Enabled'
 
-foreach ($feauture in $requieredFeautures){
-    $test = Dism /online /Get-FeatureInfo /FeatureName:$feauture
+###+++++++ Enable WSL and Install WSL2+++++++###
+if($installWSL){
+    $requieredFeautures = 'Microsoft-Windows-Subsystem-Linux','VirtualMachinePlatform'
+    $match = 'State : Enabled'
+
+    foreach ($feauture in $requieredFeautures){
+        $test = dism.exe /online /Get-FeatureInfo /FeatureName:$feauture
     
-    if($test -like "*$match*"){
-        Write-Host "Feauture $feauture is enabled"
+        if($test -like "*$match*"){
+            Write-Host "Feauture $feauture is enabled"
+        }
+        else{
+            dism.exe /online /enable-feature /featurename:$feauture /all /norestart
+        }
     }
-    else{
-        dism.exe /online /enable-feature /featurename:$feauture /all /norestart
-    }
+    Invoke-WebRequest https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi -OutFile wsl_update_x64.msi
+    ./wsl_update_x64.msi /quiet
+    Remove-Item wsl_update_x64.msi
+    wsl --set-default-version 2
+    Write-Host "Default WSL version set: 2"
+    
+}
+else{
+    Write-Host 'Windows-Subsystem-Linux Installation was skipped...'
 }
 
 ###+++++++ Install Debian +++++++###
 
 wsl --install -d Debian
-wsl -d Debian -u root "./scripts/setDebianDistro.sh"
+
+try{
+    wsl -d Debian -u root "./scripts/setDebianDistro.sh"
+}
+catch{
+    
+}
 
 ###+++++++ Install Docker +++++++###
 
