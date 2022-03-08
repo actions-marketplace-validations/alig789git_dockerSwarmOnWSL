@@ -26,11 +26,12 @@ if($installWSL){
     ./wsl_update_x64.msi /quiet
     Remove-Item wsl_update_x64.msi
     wsl --set-default-version 2
-    Write-Host "Default WSL version set: 2"
+    Write-Host "Default WSL version set: 2" -BackgroundColor Yellow -ForegroundColor Black
     
 }
 else{
-    Write-Host 'Windows-Subsystem-Linux Installation is skipped...'
+    Write-Host 'Windows-Subsystem-Linux Installation is skipped...' -BackgroundColor Red -ForegroundColor Black
+    
 }
 ###+++++++ Create Distro +++++++###
 if($createDistro){
@@ -42,34 +43,34 @@ if($createDistro){
 
     wsl -d Debian -u root "./scripts/setDebianDistro.sh"
 
-    Write-Host "Debian subsystem is installed"
-
+    Write-Host "Debian subsystem is installed" -BackgroundColor Yellow -ForegroundColor Black
+    
     ###+++++++ Install Docker +++++++###
 
     wsl -d Debian -u root "./scripts/addDocker2Debian.sh"
-    Write-Host "Docker is installed"
+    Write-Host "Docker is installed" -BackgroundColor Yellow -ForegroundColor Black
 
     ###+++++++ Export Debian +++++++###
 
     if (Test-Path -Path $wslpath){
         Remove-Item -Path $wslpath -Recurse -Force
     }
-    Write-Host "All old disttibutions are removed"
+    Write-Host "All old disttibutions are removed" -BackgroundColor Yellow -ForegroundColor Black
 
     if(-not(Test-Path -Path $wslpath)){
         New-Item -Path $wslpath_full -ItemType 'directory'
     }
-    Write-Host "New place for WSLSwarmCluster is $wslpath_full"
+    Write-Host "New place for WSLSwarmCluster is $wslpath_full" -BackgroundColor Yellow -ForegroundColor Black
 
     wsl --export Debian $wslpath_full'\dockerondebian.tar'
 
-    Write-Host "Distribution exports to $wslpath_full\dockerondebian.tar"
+    Write-Host "Distribution exports to $wslpath_full\dockerondebian.tar" -BackgroundColor Yellow -ForegroundColor Black
 
     wsl --unregister Debian
 
 }
 else{
-    Write-Host 'Create Distribution is skipped...'
+    Write-Host 'Create Distribution is skipped...' -BackgroundColor Red -ForegroundColor Black
 }
 
 ###+++++++Deploy Debian deb-master +++++++###
@@ -81,10 +82,10 @@ if($deployMaster){
     Start-Sleep -Seconds 15
     [System.Collections.ArrayList]$swarm_token = wsl -d deb-master -u root "./scripts/swarmInit.sh"
     "#!/bin/bash`n"+$swarm_token[4].Trim()+"`n" | Out-File -FilePath '.\scripts\swarmJoin.sh' -Encoding utf8
-    Write-Host 'Deploy Master deb-master is done...'
+    Write-Host 'Deploy Master deb-master is done...' -BackgroundColor Yellow -ForegroundColor Black
 }
 else{
-    Write-Host 'Deploy Master is skipped...'
+    Write-Host 'Deploy Master is skipped...' -BackgroundColor Red -ForegroundColor Black
 }
 
 ###+++++++Deploy Debian deb-nodes +++++++###
@@ -96,10 +97,10 @@ if($deployNodes){
         wsl -d deb-node-$node -u root service --status-all
         Start-Sleep -Seconds 15
         wsl -d deb-node-$node -u root "./scripts/swarmJoin.sh"
-        Write-Host "Deploy Node deb-node-$node is done..."
+        Write-Host "Deploy Node deb-node-$node is done..." -BackgroundColor Yellow -ForegroundColor Black
         $node--
     }
 }
 else{
-    Write-Host 'Deploy Nodes is skipped...'
+    Write-Host 'Deploy Nodes is skipped...' -BackgroundColor Red -ForegroundColor Black
 }
