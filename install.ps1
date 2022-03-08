@@ -3,6 +3,19 @@ $wslpath_pref = '\distro'
 $wslpath_full = $wslpath+$wslpath_pref
 $node = 2
 ###+++++++ Install WSL +++++++###
+$requieredFeautures = 'Microsoft-Windows-Subsystem-Linux','VirtualMachinePlatform'
+$match = 'State : Enabled'
+
+foreach ($feauture in $requieredFeautures){
+    $test = Dism /online /Get-FeatureInfo /FeatureName:$feauture
+    
+    if($test -like "*$match*"){
+        Write-Host "Feauture $feauture is enabled"
+    }
+    else{
+        dism.exe /online /enable-feature /featurename:$feauture /all /norestart
+    }
+}
 
 ###+++++++ Install Debian +++++++###
 
