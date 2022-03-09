@@ -1,11 +1,20 @@
-﻿$installWSL = $false
-$createDistro = $true
-$wslpath = 'C:\WSL'
+﻿Param(
+    [Parameter(HelpMessage ="InstallWSL")][Alias('IsInstallWSL')][bool] $installWSL=$false,
+    [Parameter(HelpMessage ="CreateDistibution")][Alias('CreateDistibution')][bool] $createDistro=$true,
+    [Parameter(HelpMessage ="DeployMaster")][Alias('IsDeployMaster')][bool] $deployMaster=$true,
+    [Parameter(HelpMessage ="DeployNodes")][Alias('IsDeployNodes')][bool] $deployNodes = $true,
+    [Parameter(Mandatory=$true,HelpMessage ="QuantityNodes")][Alias('QuantityNodes')][int] $node,
+    [Parameter(HelpMessage ="WSLDeployPath")][Alias('WSLDeployPath')] $wslpath='C:\WSL'
+)
+
+#$installWSL = $false
+#$createDistro = $true
+#$wslpath = 'C:\WSL'
 $wslpath_pref = '\distro'
 $wslpath_full = $wslpath+$wslpath_pref
-$deployMaster=$true
-$deployNodes=$true
-$node = 2
+#$deployMaster=$true
+#$deployNodes=$true
+#$node = 2
 
 ###+++++++ Enable WSL and Install WSL2+++++++###
 if($installWSL){
@@ -92,12 +101,14 @@ else{
 
 if($deployNodes){
     While($node -gt 0){
-        wsl --import deb-node-$node $wslpath'\node-'$node $wslpath_full'\dockerondebian.tar' 
-        wsl -d deb-node-$node -u root exit
-        wsl -d deb-node-$node -u root service --status-all
+        $tstamp = Get-Date
+        $tstamp = $tstamp.Ticks
+        wsl --import deb-node-$tstamp $wslpath'\node-'$tstamp $wslpath_full'\dockerondebian.tar' 
+        wsl -d deb-node-$tstamp -u root exit
+        wsl -d deb-node-$tstamp -u root service --status-all
         Start-Sleep -Seconds 15
-        wsl -d deb-node-$node -u root "./scripts/swarmJoin.sh"
-        Write-Host "Deploy Node deb-node-$node is done..." -BackgroundColor Yellow -ForegroundColor Black
+        wsl -d deb-node-$tstamp -u root "./scripts/swarmJoin.sh"
+        Write-Host "Deploy Node deb-node-$tstamp is done..." -BackgroundColor Yellow -ForegroundColor Black
         $node--
     }
 }
