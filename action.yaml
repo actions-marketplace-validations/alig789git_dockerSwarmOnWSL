@@ -1,0 +1,3 @@
+name: dockerSwarmOnWSL
+author: Igor Aleksandrov <systemengeneer@gmail.com>
+description: Automated deployment environment of Docker Swarm cluster on Windows WSL
